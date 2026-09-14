@@ -1,0 +1,16 @@
+# Local development example env vars
+# Copy to .dev.vars and fill values
+
+# WorkOS — use the dedicated AI Slides Hoster apps only (not Availabooks/Blogger).
+# Local/dev: staging client + staging API key (sk_test_…).
+# Production: wrangler.jsonc vars.WORKOS_CLIENT_ID + wrangler secret put WORKOS_API_KEY
+WORKOS_API_KEY=sk_test_your_staging_api_key
+WORKOS_CLIENT_ID=client_01M2B1F1C2VS1HFTYA4N9GQJ6K
+
+# Session
+SESSION_SECRET=replace-with-a-long-random-string
+
+# Cloudflare Email Service (no Resend). From address must be on an onboarded domain.
+EMAIL_FROM="Slides <auth@slides.availabooks.com>"
+# Optional logo for emails
+# EMAIL_LOGO_URL=https://slides.availabooks.com/logo.png

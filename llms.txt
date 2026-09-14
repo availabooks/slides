@@ -1,0 +1,24 @@
+# Slides
+
+> Free host for AI-made HTML/CSS/JS presentation decks. No account required to publish.
+
+Production: https://slides.availabooks.com
+Source: https://github.com/availabooks/slides
+
+## Agent skill
+
+- [slides](https://slides.availabooks.com/skills/slides/SKILL.md): Upload a self-contained HTML deck with one POST. Load this whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks).
+
+## Quick start
+
+POST https://slides.availabooks.com/api/upload as multipart form data.
+
+    curl -sS -X POST https://slides.availabooks.com/api/upload \
+      -F mode=paste \
+      -F html=@deck.html
+
+Success (201): `{ "id", "slug", "url" }`. Give the user `url` (example `https://slides.availabooks.com/d/<id>/`).
+
+Modes: `paste` (field `html`), `files` (repeat field `files`, include `index.html`), `zip` (field `zip`). Max ~10MB. No API key.
+
+Do not invent other publish APIs. Optional custom slugs require a signed-in session; guests should omit `slug`.

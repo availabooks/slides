@@ -1,0 +1,35 @@
+{
+  "name": "ai-slides-hoster",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-09-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "single-page-application"
+  },
+  "r2_buckets": [
+    {
+      "binding": "DECKS",
+      "bucket_name": "deckdrop-decks",
+      "preview_bucket_name": "deckdrop-decks-dev"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "slides.availabooks.com",
+      "custom_domain": true
+    }
+  ],
+  "workers_dev": true,
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "vars": {
+    "WORKOS_CLIENT_ID": "client_01M2B1JYJQSP6BTSC4YV99QB77",
+    "EMAIL_FROM": "Slides <auth@slides.availabooks.com>"
+  }
+}
