@@ -136,16 +136,26 @@ This starts a local dev server with:
 Deploy
 ------
 
-Provision the R2 bucket `deckdrop-decks` in your Cloudflare account, then:
+Pushing (or merging) to `main` on https://github.com/availabooks/slides deploys production at https://slides.availabooks.com. The workflow is `.github/workflows/deploy.yml`: install, `npm run build`, then `wrangler deploy` via `cloudflare/wrangler-action`.
+
+GitHub Actions needs these repository (or org) secrets — same names as `availabooks/app`:
+
+- `CLOUDFLARE_API_TOKEN` — token with **Edit Cloudflare Workers** on the Availabooks account
+- `CLOUDFLARE_ACCOUNT_ID` — `0bfdb544606ce71a8c67be03fabd48ee`
+
+Worker secrets (`WORKOS_API_KEY`, `SESSION_SECRET`) stay in Cloudflare; a deploy does not rotate them. You can also run the workflow by hand from Actions → Deploy → Run workflow.
+
+First-time account setup (once):
 ```
 wrangler r2 bucket create deckdrop-decks
-wrangler deploy
-```
-
-Configure production secrets in Cloudflare (production WorkOS API key, not staging):
-```
 wrangler secret put WORKOS_API_KEY
 wrangler secret put SESSION_SECRET
+```
+
+Manual deploy from a laptop:
+```
+npm run build
+npx wrangler deploy
 ```
 
 Production `WORKOS_CLIENT_ID` is `client_01M2B1JYJQSP6BTSC4YV99QB77` via `wrangler.jsonc` vars. `EMAIL_FROM` defaults to `Slides <auth@slides.availabooks.com>`.
@@ -176,4 +186,4 @@ Notes
 
 - Deck IDs are short URL‑safe strings. Owners can unpublish (delete) decks they own; guests cannot.
 - Authentication uses WorkOS Magic Auth API with a custom UI — no hosted AuthKit pages are used.
-- The Worker runs first and falls back to static assets; the SPA uses client‑side routing with single‑page‑application fallback for unknown paths.
+- The Worker runs first and falls back to static assets; the SPA uses client‑side routing with single‑page-application fallback for unknown paths.

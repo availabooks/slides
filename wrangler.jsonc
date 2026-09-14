@@ -1,6 +1,7 @@
 {
   "name": "ai-slides-hoster",
   "main": "src/worker/index.ts",
+  "account_id": "0bfdb544606ce71a8c67be03fabd48ee",
   "compatibility_date": "2026-09-12",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
