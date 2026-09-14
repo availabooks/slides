@@ -32,7 +32,7 @@ export default function Home() {
         <p className="muted">
           Publish a deck with one POST. No account or API key.{' '}
           <a href="/skills/slides/SKILL.md">Load the skill</a>
-          {' \u00b7 '}
+          {' · '}
           <a href="/llms.txt">llms.txt</a>
         </p>
         <pre className="agent-snippet">
