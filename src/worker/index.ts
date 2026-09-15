@@ -44,6 +44,11 @@ const AGENT_DOCS: Record<string, string> = {
 function contentTypeForAgentDoc(pathname: string): string | null {
   if (AGENT_DOCS[pathname]) return AGENT_DOCS[pathname];
   if (pathname === '/skills/slides.zip') return 'application/zip';
+  if (/^\/slides-host\/[A-Za-z0-9._-]+$/.test(pathname)) {
+    if (pathname.endsWith('.js')) return 'text/javascript; charset=UTF-8';
+    if (pathname.endsWith('.css')) return 'text/css; charset=UTF-8';
+    return null;
+  }
   const m = pathname.match(/^\/skills\/slides\/([A-Za-z0-9._-]+)$/);
   if (!m) return null;
   const file = m[1];
@@ -174,13 +179,36 @@ async function maybeServeDeck(request: Request, env: Env): Promise<Response | nu
   const ct = (obj.httpMetadata && (obj.httpMetadata as any).contentType) || contentTypeFor(rest);
   const headers = new Headers();
   if (ct) headers.set('Content-Type', ct);
-  // Basic caching for assets; HTML no-cache
   if (rest.endsWith('.html')) {
     headers.set('Cache-Control', 'no-cache');
-  } else {
-    headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    const html = enhanceDeckHtml(await obj.text());
+    return new Response(html, { status: 200, headers });
   }
+  headers.set('Cache-Control', 'public, max-age=31536000, immutable');
   return new Response(obj.body, { status: 200, headers });
+}
+
+function enhanceDeckHtml(html: string): string {
+  if (/\/slides-host\/slides-host\.js/i.test(html)) return html;
+  let out = html;
+  if (!/<meta[^>]+name=["']viewport["']/i.test(out)) {
+    if (/<head[^>]*>/i.test(out)) {
+      out = out.replace(
+        /<head([^>]*)>/i,
+        '<head$1>\n<meta name="viewport" content="width=device-width, initial-scale=1" />'
+      );
+    }
+  }
+  const tags =
+    '<link rel="stylesheet" href="/slides-host/slides-host.css" />\n' +
+    '<script src="/slides-host/slides-host.js" defer></script>\n';
+  if (/<\/body>/i.test(out)) {
+    return out.replace(/<\/body>/i, `${tags}</body>`);
+  }
+  if (/<\/html>/i.test(out)) {
+    return out.replace(/<\/html>/i, `${tags}</html>`);
+  }
+  return `${out}\n${tags}`;
 }
 
 async function handleUpload(request: Request, env: Env): Promise<Response> {
