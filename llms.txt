@@ -1,13 +1,13 @@
 # Slides
 
-> Free host for AI-made HTML/CSS/JS presentation decks. No account required to publish.
+> Free host for AI-made HTML/CSS/JS presentation decks. No account required to publish. Sign in to choose a custom /d/<name>/ URL.
 
 Production: https://slides.availabooks.com
 Source: https://github.com/availabooks/slides
 
 ## Agent skill
 
-- [slides](https://slides.availabooks.com/skills/slides/SKILL.md): Upload a self-contained HTML deck with one POST. Load this whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks).
+- [slides](https://slides.availabooks.com/skills/slides/SKILL.md): Upload a self-contained HTML deck. Guest POST is enough for a random URL. Load this whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks), including custom slugs after Magic Auth.
 
 ## Quick start
 
@@ -21,4 +21,6 @@ Success (201): `{ "id", "slug", "url" }`. Give the user `url` (example `https://
 
 Modes: `paste` (field `html`), `files` (repeat field `files`, include `index.html`), `zip` (field `zip`). Max ~10MB. No API key.
 
-Do not invent other publish APIs. Optional custom slugs require a signed-in session; guests should omit `slug`.
+Custom `/d/<name>/` URLs: sign the user in with Magic Auth (`POST /api/auth/magic/start` then `verify`), then upload with `Authorization: Bearer <session>` and form field `slug`. Never invent the 6-digit email code. CLI: `npx slides login --email …` then `npx slides upload deck.html --slug my-talk`.
+
+Do not invent other publish APIs. Do not call WorkOS directly.

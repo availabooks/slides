@@ -3,12 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "slides": "./bin/slides.mjs"
+  },
   "scripts": {
     "dev": "wrangler dev --local",
     "build:web": "vite build --config web/vite.config.ts",
     "build:types": "tsc -p tsconfig.json --noEmit",
     "build": "npm run build:web && npm run build:types",
     "preview": "serve dist",
+    "slides": "node bin/slides.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {
