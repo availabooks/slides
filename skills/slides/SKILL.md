@@ -193,7 +193,7 @@ From a clone of this repo, `npx slides` is the same file (`skills/slides/slides.
 `Content-Type` must be `multipart/form-data` (curl `-F` does this). JSON bodies are not accepted for upload.
 
 | Field | Required | Notes |
-| --- | --- |
+| --- | --- | --- |
 | `mode` | yes | `paste`, `files`, or `zip` |
 | `html` | if `paste` | Full HTML document. File (`html=@deck.html`) or string. |
 | `files` | if `files` | Repeat the field for each file. Must include `index.html`, or a **single** `.html` file (renamed to `index.html`). |
