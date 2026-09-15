@@ -12,6 +12,8 @@ If you need to **publish a deck**, do not guess APIs. The skill folder is the wh
 
 Guest upload is `POST https://slides.availabooks.com/api/upload` as multipart form data (`mode=paste` + `html`). No API key. Return the `url` from the `201` JSON to the user.
 
+If you generate the HTML, wrap each slide in `<section class="slide">` inside `#deck` so the host can add mobile swipe, `#n` deep links, and a thumbnail picker. Reveal.js already has `#/n` and overview — don’t also wrap it as `.slide`. Opt out with `<html data-slides-host="off">`. Details: the skill.
+
 Custom `/d/<name>/` URLs need a signed-in session. Prefer the bundled CLI:
 
 ```

@@ -15,6 +15,8 @@ The skill folder is the whole package: markdown + a zero-dependency Node CLI.
 
 Load the skill whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks), including custom slugs after Magic Auth.
 
+Decks that use `#deck > .slide` (or `.deck > section`) automatically get mobile swipe, shareable `#n` links, and a thumbnail jumper. Reveal.js keeps its own `#/n` + overview. See the skill.
+
     curl -fsSL -o slides.zip https://slides.availabooks.com/skills/slides.zip
     unzip slides.zip
     node slides/slides.mjs upload deck.html --slug my-talk

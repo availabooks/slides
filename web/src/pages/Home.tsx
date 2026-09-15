@@ -24,6 +24,10 @@ export default function Home() {
           <li>Upload supports paste, multiple files, or a .zip</li>
           <li>Guests get a random public URL like /d/abc123xyz/</li>
           <li>Signed-in users can also pick a name like /d/welcome/</li>
+          <li>
+            Decks with <code>.slide</code> sections get mobile swipe, #slide
+            links, and a thumbnail jumper
+          </li>
           <li>Signed-in users get a library and can unpublish</li>
         </ul>
       </div>

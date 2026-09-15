@@ -20,7 +20,9 @@ function copyAgentDocs() {
     closeBundle() {
       const dist = resolve(__dirname, '../dist');
       mkdirSync(resolve(dist, 'skills'), { recursive: true });
+      mkdirSync(resolve(dist, 'slides-host'), { recursive: true });
       cpSync(resolve(__dirname, '../skills/slides'), resolve(dist, 'skills/slides'), { recursive: true });
+      cpSync(resolve(__dirname, '../src/runtime'), resolve(dist, 'slides-host'), { recursive: true });
       cpSync(resolve(__dirname, '../llms.txt'), resolve(dist, 'llms.txt'));
       zipSkillFolder(dist);
     }
