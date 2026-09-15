@@ -41,12 +41,22 @@ const AGENT_DOCS: Record<string, string> = {
   '/llms.txt': 'text/plain; charset=UTF-8',
   '/skills/slides/SKILL.md': 'text/markdown; charset=UTF-8'
 };
-const UPLOAD_CORS: Record<string, string> = {
+const AGENT_CORS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Accept',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization',
   'Access-Control-Max-Age': '86400'
 };
+
+function isAgentCorsPath(pathname: string): boolean {
+  return (
+    pathname === '/api/upload' ||
+    pathname === '/api/auth/magic/start' ||
+    pathname === '/api/auth/magic/verify' ||
+    pathname === '/api/me' ||
+    /^\/api\/decks\/[^/]+$/.test(pathname)
+  );
+}
 
 type DeckMeta = {
   id: string;
@@ -81,21 +91,23 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   try {
     if (method === 'GET' && url.pathname === '/api/me') {
       const sess = await getSessionFromRequest(request, env);
-      return json({ authenticated: !!sess, user: sess ? { id: sess.userId, email: sess.email } : null });
+      return withAgentCors(
+        json({ authenticated: !!sess, user: sess ? { id: sess.userId, email: sess.email } : null })
+      );
+    }
+    if (isAgentCorsPath(url.pathname) && method === 'OPTIONS') {
+      return withAgentCors(new Response(null, { status: 204 }));
     }
     if (url.pathname === '/api/upload') {
-      if (method === 'OPTIONS') {
-        return withUploadCors(new Response(null, { status: 204 }));
-      }
       if (method === 'POST') {
-        return withUploadCors(await handleUpload(request, env));
+        return withAgentCors(await handleUpload(request, env));
       }
     }
     if (method === 'POST' && url.pathname === '/api/auth/magic/start') {
-      return await handleMagicStart(request, env);
+      return withAgentCors(await handleMagicStart(request, env));
     }
     if (method === 'POST' && url.pathname === '/api/auth/magic/verify') {
-      return await handleMagicVerify(request, env);
+      return withAgentCors(await handleMagicVerify(request, env));
     }
     if (method === 'POST' && url.pathname === '/api/auth/logout') {
       return await handleLogout();
@@ -107,18 +119,18 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
     if (deckMatch) {
       const id = deckMatch[1];
       if (method === 'DELETE') return await handleDeleteDeck(request, env, id);
-      if (method === 'PATCH') return await handlePatchDeck(request, env, id);
+      if (method === 'PATCH') return withAgentCors(await handlePatchDeck(request, env, id));
     }
     return json({ error: 'Not found' }, 404);
   } catch (err: unknown) {
     const path = new URL(request.url).pathname;
     if (err instanceof HttpError) {
       const res = json({ error: err.message }, err.status);
-      return path === '/api/upload' ? withUploadCors(res) : res;
+      return isAgentCorsPath(path) ? withAgentCors(res) : res;
     }
     console.error('API error', err);
     const res = json({ error: 'Internal Server Error' }, 500);
-    return path === '/api/upload' ? withUploadCors(res) : res;
+    return isAgentCorsPath(path) ? withAgentCors(res) : res;
   }
 }
 
@@ -460,16 +472,15 @@ async function handleMagicVerify(request: Request, env: Env): Promise<Response> 
     const out = payload.data || {};
     const userId: string =
       out?.user?.id || out?.user_id || out?.id || `email:${await sha256Hex(email.toLowerCase())}`;
-    const cookie = await createSessionCookie(
+    const session = await createSession(
       { userId, email: (out?.user?.email || email).toLowerCase() },
       env.SESSION_SECRET || (await defaultDevSecret(env))
     );
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Set-Cookie': cookie
-      }
-    });
+    return json(
+      { session: session.token, user: { email: (out?.user?.email || email).toLowerCase() } },
+      200,
+      { 'Set-Cookie': session.cookie }
+    );
   } catch (err: any) {
     return json({ error: 'Verification failed' }, 502);
   }
@@ -481,14 +492,22 @@ async function handleLogout(): Promise<Response> {
 }
 
 async function getSessionFromRequest(request: Request, env: Env): Promise<Session | null> {
-  const cookie = request.headers.get('Cookie') || '';
-  const raw = parseCookie(cookie)[SESSION_COOKIE];
+  const secret = env.SESSION_SECRET || (await defaultDevSecret(env));
+  const raw = sessionTokenFromRequest(request);
   if (!raw) return null;
   try {
-    return await verifySessionCookie(raw, env.SESSION_SECRET || (await defaultDevSecret(env)));
+    return await verifySessionCookie(raw, secret);
   } catch {
     return null;
   }
+}
+
+function sessionTokenFromRequest(request: Request): string | null {
+  const auth = request.headers.get('Authorization') || '';
+  const bearer = auth.match(/^Bearer\s+(.+)$/i);
+  if (bearer?.[1]) return bearer[1].trim();
+  const cookie = request.headers.get('Cookie') || '';
+  return parseCookie(cookie)[SESSION_COOKIE] || null;
 }
 
 function json(body: any, status = 200, headers?: HeadersInit): Response {
@@ -497,9 +516,9 @@ function json(body: any, status = 200, headers?: HeadersInit): Response {
   return new Response(JSON.stringify(body, null, 2), { status, headers: h });
 }
 
-function withUploadCors(res: Response): Response {
+function withAgentCors(res: Response): Response {
   const headers = new Headers(res.headers);
-  for (const [key, value] of Object.entries(UPLOAD_CORS)) {
+  for (const [key, value] of Object.entries(AGENT_CORS)) {
     headers.set(key, value);
   }
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
@@ -609,20 +628,20 @@ function parseCookie(header: string): Record<string, string> {
   return out;
 }
 
-async function createSessionCookie(
+async function createSession(
   user: { userId: string; email: string },
   secret: string
-): Promise<string> {
+): Promise<{ token: string; cookie: string }> {
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + SESSION_DAYS * 24 * 60 * 60;
   const payload: Session = { userId: user.userId, email: user.email, iat, exp };
   const payloadB64 = base64Url(new TextEncoder().encode(JSON.stringify(payload)));
   const sig = await hmacSha256Base64Url(payloadB64, secret);
-  const value = `${payloadB64}.${sig}`;
-  const cookie = `${SESSION_COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${
+  const token = `${payloadB64}.${sig}`;
+  const cookie = `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${
     SESSION_DAYS * 24 * 60 * 60
   }; Secure`;
-  return cookie;
+  return { token, cookie };
 }
 
 async function verifySessionCookie(raw: string, secret: string): Promise<Session> {
