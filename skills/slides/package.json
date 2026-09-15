@@ -1,0 +1,10 @@
+{
+  "name": "slides",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "slides": "./slides.mjs"
+  },
+  "description": "CLI for slides.availabooks.com. Bundled with the Slides agent skill — no extra npm dependencies."
+}
