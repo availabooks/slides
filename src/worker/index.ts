@@ -43,6 +43,7 @@ const AGENT_DOCS: Record<string, string> = {
 
 function contentTypeForAgentDoc(pathname: string): string | null {
   if (AGENT_DOCS[pathname]) return AGENT_DOCS[pathname];
+  if (pathname === '/skills/slides.zip') return 'application/zip';
   const m = pathname.match(/^\/skills\/slides\/([A-Za-z0-9._-]+)$/);
   if (!m) return null;
   const file = m[1];
@@ -50,6 +51,7 @@ function contentTypeForAgentDoc(pathname: string): string | null {
   if (file.endsWith('.mjs') || file.endsWith('.js')) return 'text/javascript; charset=UTF-8';
   if (file.endsWith('.json')) return 'application/json; charset=UTF-8';
   if (file.endsWith('.txt')) return 'text/plain; charset=UTF-8';
+  if (file.endsWith('.zip')) return 'application/zip';
   return null;
 }
 
@@ -556,6 +558,9 @@ async function maybeServeAgentDoc(request: Request, env: Env): Promise<Response 
   headers.set('Content-Type', contentType);
   headers.set('Cache-Control', 'public, max-age=300');
   headers.set('Access-Control-Allow-Origin', '*');
+  if (contentType === 'application/zip') {
+    headers.set('Content-Disposition', 'attachment; filename="slides.zip"');
+  }
   return new Response(asset.body, { status: 200, headers });
 }
 
