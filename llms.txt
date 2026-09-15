@@ -5,9 +5,17 @@
 Production: https://slides.availabooks.com
 Source: https://github.com/availabooks/slides
 
-## Agent skill
+## Agent skill (includes CLI)
 
-- [slides](https://slides.availabooks.com/skills/slides/SKILL.md): Upload a self-contained HTML deck. Guest POST is enough for a random URL. Load this whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks), including custom slugs after Magic Auth.
+The skill folder is the whole package: markdown + a zero-dependency Node CLI.
+
+- [slides skill](https://slides.availabooks.com/skills/slides/SKILL.md)
+- [slides.mjs CLI](https://slides.availabooks.com/skills/slides/slides.mjs)
+
+Load the skill whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks), including custom slugs after Magic Auth.
+
+    curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
+    node slides.mjs upload deck.html --slug my-talk
 
 ## Quick start
 
@@ -21,6 +29,6 @@ Success (201): `{ "id", "slug", "url" }`. Give the user `url` (example `https://
 
 Modes: `paste` (field `html`), `files` (repeat field `files`, include `index.html`), `zip` (field `zip`). Max ~10MB. No API key.
 
-Custom `/d/<name>/` URLs: sign the user in with Magic Auth (`POST /api/auth/magic/start` then `verify`), then upload with `Authorization: Bearer <session>` and form field `slug`. Never invent the 6-digit email code. CLI: `npx slides login --email …` then `npx slides upload deck.html --slug my-talk`.
+Custom `/d/<name>/` URLs: sign the user in with Magic Auth (`POST /api/auth/magic/start` then `verify`), then upload with `Authorization: Bearer <session>` and form field `slug`. Never invent the 6-digit email code. Prefer the bundled CLI (`slides.mjs`) for that flow.
 
 Do not invent other publish APIs. Do not call WorkOS directly.

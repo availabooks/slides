@@ -2,16 +2,24 @@
 
 This repo is the source for **Slides**, a free host for HTML/CSS/JS presentation decks.
 
-If you need to **publish a deck**, do not guess APIs. Read and follow:
+If you need to **publish a deck**, do not guess APIs. The skill folder is the whole package (docs + CLI):
 
-- Live: https://slides.availabooks.com/skills/slides/SKILL.md
-- In-repo: [skills/slides/SKILL.md](skills/slides/SKILL.md)
+- Live skill: https://slides.availabooks.com/skills/slides/SKILL.md
+- Live CLI: https://slides.availabooks.com/skills/slides/slides.mjs
+- In-repo: [skills/slides/](skills/slides/)
 - Discovery: https://slides.availabooks.com/llms.txt
-- CLI: `node bin/slides.mjs` (`npx slides` after `npm install`)
 
 Guest upload is `POST https://slides.availabooks.com/api/upload` as multipart form data (`mode=paste` + `html`). No API key. Return the `url` from the `201` JSON to the user.
 
-Custom `/d/<name>/` URLs need a signed-in session. Ask the user for their email and the 6-digit Magic Auth code (never invent it), then:
+Custom `/d/<name>/` URLs need a signed-in session. Prefer the bundled CLI:
+
+```
+curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
+node slides.mjs login --email you@example.com
+node slides.mjs upload deck.html --slug my-talk
+```
+
+Or curl Magic Auth yourself (never invent the 6-digit email code):
 
 1. `POST /api/auth/magic/start` `{ email }`
 2. `POST /api/auth/magic/verify` `{ email, code }` → `{ session, user }`

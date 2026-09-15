@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "slides": "./bin/slides.mjs"
+    "slides": "./skills/slides/slides.mjs"
   },
   "scripts": {
     "dev": "wrangler dev --local",
@@ -12,7 +12,7 @@
     "build:types": "tsc -p tsconfig.json --noEmit",
     "build": "npm run build:web && npm run build:types",
     "preview": "serve dist",
-    "slides": "node bin/slides.mjs",
+    "slides": "node skills/slides/slides.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

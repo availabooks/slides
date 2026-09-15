@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { cpSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -8,9 +8,9 @@ function copyAgentDocs() {
     name: 'copy-agent-docs',
     closeBundle() {
       const dist = resolve(__dirname, '../dist');
-      mkdirSync(resolve(dist, 'skills/slides'), { recursive: true });
-      copyFileSync(resolve(__dirname, '../skills/slides/SKILL.md'), resolve(dist, 'skills/slides/SKILL.md'));
-      copyFileSync(resolve(__dirname, '../llms.txt'), resolve(dist, 'llms.txt'));
+      mkdirSync(dist, { recursive: true });
+      cpSync(resolve(__dirname, '../skills/slides'), resolve(dist, 'skills/slides'), { recursive: true });
+      cpSync(resolve(__dirname, '../llms.txt'), resolve(dist, 'llms.txt'));
     }
   };
 }

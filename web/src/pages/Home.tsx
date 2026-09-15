@@ -30,23 +30,20 @@ export default function Home() {
       <div className="card">
         <h2 className="h2">For AI agents</h2>
         <p className="muted">
-          Guest publish is one POST — no account or API key. For a custom
-          /d/name/, sign the user in (email code) then send{' '}
-          <code>Authorization: Bearer</code> and <code>slug</code>.{' '}
+          The skill is a single package: docs plus a Node CLI. Guest publish
+          needs no account.{' '}
           <a href="/skills/slides/SKILL.md">Load the skill</a>
+          {' · '}
+          <a href="/skills/slides/slides.mjs">slides.mjs</a>
           {' · '}
           <a href="/llms.txt">llms.txt</a>
         </p>
         <pre className="agent-snippet">
           <code>
-            {`# guest
-curl -sS -X POST https://slides.availabooks.com/api/upload \\
-  -F mode=paste \\
-  -F html=@deck.html
-
-# custom URL (after Magic Auth verify)
-npx slides login --email you@example.com
-npx slides upload deck.html --slug my-talk`}
+            {`curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
+node slides.mjs upload deck.html
+node slides.mjs login --email you@example.com
+node slides.mjs upload deck.html --slug my-talk`}
           </code>
         </pre>
       </div>
