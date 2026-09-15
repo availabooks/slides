@@ -38,9 +38,21 @@ const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // ~10MB
 const SLUG_PATTERN = /^[a-z][a-z0-9-]{1,31}$/;
 const RESERVED_SLUGS = new Set(['api', 'd', 'upload', 'sign-in', 'decks', 'pricing', 'assets', 'www']);
 const AGENT_DOCS: Record<string, string> = {
-  '/llms.txt': 'text/plain; charset=UTF-8',
-  '/skills/slides/SKILL.md': 'text/markdown; charset=UTF-8'
+  '/llms.txt': 'text/plain; charset=UTF-8'
 };
+
+function contentTypeForAgentDoc(pathname: string): string | null {
+  if (AGENT_DOCS[pathname]) return AGENT_DOCS[pathname];
+  const m = pathname.match(/^\/skills\/slides\/([A-Za-z0-9._-]+)$/);
+  if (!m) return null;
+  const file = m[1];
+  if (file.endsWith('.md')) return 'text/markdown; charset=UTF-8';
+  if (file.endsWith('.mjs') || file.endsWith('.js')) return 'text/javascript; charset=UTF-8';
+  if (file.endsWith('.json')) return 'application/json; charset=UTF-8';
+  if (file.endsWith('.txt')) return 'text/plain; charset=UTF-8';
+  return null;
+}
+
 const AGENT_CORS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
@@ -527,7 +539,7 @@ function withAgentCors(res: Response): Response {
 async function maybeServeAgentDoc(request: Request, env: Env): Promise<Response | null> {
   if (request.method.toUpperCase() !== 'GET') return null;
   const pathname = new URL(request.url).pathname;
-  const contentType = AGENT_DOCS[pathname];
+  const contentType = contentTypeForAgentDoc(pathname);
   if (!contentType) return null;
   const asset = await env.ASSETS.fetch(request);
   const assetType = asset.headers.get('content-type') || '';
