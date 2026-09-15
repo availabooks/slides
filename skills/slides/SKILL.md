@@ -1,6 +1,6 @@
 ---
 name: slides
-description: Publish HTML/CSS/JS presentation decks to Slides (slides.availabooks.com). Use when hosting, uploading, sharing, or publishing Reveal.js, impress.js, or any self-contained HTML slides. Guest POST to /api/upload, or sign in with Magic Auth to choose a custom /d/<name>/ URL.
+description: Publish HTML/CSS/JS presentation decks to Slides (slides.availabooks.com). Use when hosting, uploading, sharing, or publishing Reveal.js, impress.js, or any self-contained HTML slides. This skill includes a zero-dependency Node CLI (slides.mjs) for guest and signed-in uploads with custom /d/<name>/ URLs.
 ---
 
 # Slides — host an HTML deck
@@ -8,8 +8,18 @@ description: Publish HTML/CSS/JS presentation decks to Slides (slides.availabook
 **Slides** (`https://slides.availabooks.com`) is a free public host for AI-made HTML/CSS/JS presentation decks. There is no on-site generator. You build the HTML, then upload it and get a permanent public URL.
 
 Live skill: `https://slides.availabooks.com/skills/slides/SKILL.md`
+CLI (same package): `https://slides.availabooks.com/skills/slides/slides.mjs`
 Discovery: `https://slides.availabooks.com/llms.txt`
-CLI (this repo): `node bin/slides.mjs`
+
+This skill **is** the package. The folder contains:
+
+| File | Purpose |
+| --- | --- |
+| `SKILL.md` | This document |
+| `slides.mjs` | Node 18+ CLI (no npm dependencies) |
+| `package.json` | Optional `bin` so `npx slides` works from this folder |
+
+If this skill is already on disk, run `node slides.mjs` from this directory. If you only fetched the markdown, download the sibling CLI from the same origin (see **CLI** below).
 
 ## When to use this
 
@@ -142,36 +152,48 @@ Pass `"slug": null` (or `""`) to drop the custom name. The random `/d/<id>/` lin
 
 ## CLI
 
-From a clone of [availabooks/slides](https://github.com/availabooks/slides) (Node 18+):
+The CLI ships **in this skill** (`slides.mjs`). Node 18+ is enough — do not `npm install` the host app, and do not clone the repo just to upload.
+
+From this skill directory:
 
 ```bash
-npm install
-npx slides upload deck.html
-npx slides login --email you@example.com
-npx slides upload deck.html --slug my-talk
-npx slides slug AbCdEf123 --slug my-talk
-npx slides whoami
+node slides.mjs upload deck.html
+node slides.mjs login --email you@example.com
+node slides.mjs upload deck.html --slug my-talk
+node slides.mjs slug AbCdEf123 --slug my-talk
+node slides.mjs whoami
 ```
 
-`npx slides` is `node bin/slides.mjs`. Guest uploads omit `--slug`. Custom URLs need a session: run `login` first, or pass `--email` and `--code` on `upload`.
+If you only have this markdown (or a remote agent), fetch the CLI next to the deck:
+
+```bash
+curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
+chmod +x slides.mjs
+node slides.mjs --help
+node slides.mjs upload deck.html --slug my-talk
+```
+
+Guest uploads omit `--slug`. Custom URLs need a session: run `login` first, or pass `--email` and `--code` on `upload`.
 
 Non-interactive (agents):
 
 ```bash
-npx slides login --email you@example.com
+node slides.mjs login --email you@example.com
 # exit 2: "re-run with --code"
-npx slides login --email you@example.com --code 123456
-npx slides upload deck.html --slug my-talk
+node slides.mjs login --email you@example.com --code 123456
+node slides.mjs upload deck.html --slug my-talk
 ```
 
 Session file: `~/.slides/session` (mode 0600). Overrides: `SLIDES_SESSION`, `SLIDES_SESSION_FILE`, `SLIDES_HOST`.
+
+From a clone of this repo, `npx slides` is the same file (`skills/slides/slides.mjs`).
 
 ## Multipart fields
 
 `Content-Type` must be `multipart/form-data` (curl `-F` does this). JSON bodies are not accepted for upload.
 
 | Field | Required | Notes |
-| --- | --- | --- |
+| --- | --- |
 | `mode` | yes | `paste`, `files`, or `zip` |
 | `html` | if `paste` | Full HTML document. File (`html=@deck.html`) or string. |
 | `files` | if `files` | Repeat the field for each file. Must include `index.html`, or a **single** `.html` file (renamed to `index.html`). |
