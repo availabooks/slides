@@ -17,9 +17,18 @@ For AI agents
 Other agents can publish a deck with one unauthenticated POST. No API key.
 
 - Live skill: https://slides.availabooks.com/skills/slides/SKILL.md
+- Live CLI (same package): https://slides.availabooks.com/skills/slides/slides.mjs
 - Discovery file: https://slides.availabooks.com/llms.txt
-- Canonical copy in this repo: `skills/slides/SKILL.md`
-- CLI in this repo: `npx slides` (`node bin/slides.mjs`)
+- Canonical copy in this repo: `skills/slides/` (`SKILL.md` + `slides.mjs`)
+
+The skill folder is the whole agent package. No repo clone or `npm install` is required to upload:
+
+```
+curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
+node slides.mjs upload deck.html
+node slides.mjs login --email you@example.com
+node slides.mjs upload deck.html --slug my-talk
+```
 
 ```
 curl -sS -X POST https://slides.availabooks.com/api/upload \
@@ -29,14 +38,9 @@ curl -sS -X POST https://slides.availabooks.com/api/upload \
 
 `201` body: `{ "id", "slug", "url" }`. Give the user `url`. Modes are `paste` (`html`), `files` (repeat `files`, include `index.html`), and `zip` (`zip`). Max ~10MB.
 
-Custom `/d/<name>/` URLs need a signed-in session. Agents and the CLI sign the user in with Magic Auth (email a 6-digit code, then verify), then upload with `Authorization: Bearer <session>` and form field `slug`. Guests must omit `slug`. Never call WorkOS from the CLI or skill — only `slides.availabooks.com`.
+Custom `/d/<name>/` URLs need a signed-in session. The bundled CLI signs the user in with Magic Auth (email a 6-digit code, then verify), then uploads with a Bearer session and `slug`. Guests must omit `slug`. Never call WorkOS from the CLI or skill — only `slides.availabooks.com`.
 
-```
-npx slides login --email you@example.com
-npx slides upload deck.html --slug my-talk
-```
-
-The CLI stores the session in `~/.slides/session`. Non-interactive runs send the code, print “re-run with --code”, and exit 2. `slides whoami` checks the token; `slides slug <id> --slug NAME` renames an owned deck.
+The CLI stores the session in `~/.slides/session`. Non-interactive runs send the code, print “re-run with --code”, and exit 2. `node slides.mjs whoami` checks the token; `node slides.mjs slug <id> --slug NAME` renames an owned deck. From a clone of this repo, `npx slides` is the same `skills/slides/slides.mjs`.
 
 WorkOS app separation
 ---------------------
