@@ -232,9 +232,60 @@ Do not upload `_meta.json`. Nested `..` path segments are stripped.
 ## HTML that hosts well
 
 - One self-contained document is enough: CSS/JS in `<style>` / `<script>`, or extra files with relative paths.
-- Include `<!doctype html>`, a `<title>` (used as the deck title), and a viewport meta tag.
+- Include `<!doctype html>` and a `<title>` (used as the deck title). The host adds a viewport meta tag if you omit it.
 - CDN scripts (Reveal, fonts) are fine if the user’s viewers can reach them.
 - Size limit is ~10MB for the whole upload.
+
+## Mobile, deep links, and slide thumbnails
+
+The host injects a small runtime into every hosted HTML file. **You do not need to ship swipe/hash/thumbnail JS yourself** if the deck uses the structure below.
+
+### Automatic (recommended for new decks)
+
+Mark each slide as `.slide` (or use `<section>` children) inside `#deck` or `.deck`:
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Demo talk</title>
+</head>
+<body>
+  <div id="deck">
+    <section class="slide"><h1>Title</h1></section>
+    <section class="slide"><h2>Second point</h2></section>
+    <section class="slide"><h2>Thanks</h2></section>
+  </div>
+</body>
+</html>
+```
+
+For those decks the host adds:
+
+1. **Mobile** — viewport, swipe between slides, scroll inside a tall slide, large tap targets, safe-area padding.
+2. **Share a slide** — URL hash `#1`, `#2`, … (1-based). `https://slides.availabooks.com/d/<id>/#3` opens slide 3. Arrow keys, space, and on-screen ← → also move.
+3. **Thumbnails** — tap the `n / total` control (or press `g`) to jump to any slide.
+
+Put headings in `h1`/`h2`/`h3` so thumbnail labels are readable. Keep layout **inside** each `.slide`; the host shows one slide at a time.
+
+Opt out: `<html data-slides-host="off">`.
+
+### Reveal.js and impress.js
+
+The host **does not** take over navigation (it would fight those libraries). It still injects the viewport tag.
+
+Reveal.js already has the three features if you enable them:
+
+- Mobile: include a viewport tag (or rely on the host) and a responsive theme.
+- Deep link: `hash: true` in `Reveal.initialize` → URLs like `#/2` (and `#/2/1` for vertical stacks).
+- Overview / jump: press `Esc` or `O`.
+
+impress.js uses `#/step-id` for deep links. Do not also wrap impress steps as `.slide` inside `#deck`.
+
+### If the deck is just one long page
+
+The host cannot invent slides from a scrolling article. Split content into `.slide` sections (or use Reveal) so hash + thumbnails work.
 
 ## What not to do
 

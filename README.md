@@ -137,7 +137,7 @@ npm run dev
 This starts a local dev server with:
 - Static assets served from `dist/`
 - Worker handling:
-  - `GET /d/:id` and `GET /d/:id/*` — serve from R2 (never `_meta.json`). Custom slugs like `/d/welcome/` resolve via `slugs/<slug>`.
+  - `GET /d/:id` and `GET /d/:id/*` — serve from R2 (never `_meta.json`). Custom slugs like `/d/welcome/` resolve via `slugs/<slug>`. HTML decks get a viewport tag if missing plus `/slides-host/` runtime (swipe, `#n` hashes, thumbnail picker) when the markup uses `.slide` / `#deck`.
   - `POST /api/upload` — multipart (paste|files|zip), optional `slug` for signed-in users, ~10MB limit
   - `GET /api/me`
   - `POST /api/auth/magic/start` `{ email }` — WorkOS Magic Auth (returns 503 if `WORKOS_API_KEY` missing)
