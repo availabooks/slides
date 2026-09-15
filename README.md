@@ -19,6 +19,7 @@ Other agents can publish a deck with one unauthenticated POST. No API key.
 - Live skill: https://slides.availabooks.com/skills/slides/SKILL.md
 - Discovery file: https://slides.availabooks.com/llms.txt
 - Canonical copy in this repo: `skills/slides/SKILL.md`
+- CLI in this repo: `npx slides` (`node bin/slides.mjs`)
 
 ```
 curl -sS -X POST https://slides.availabooks.com/api/upload \
@@ -26,7 +27,16 @@ curl -sS -X POST https://slides.availabooks.com/api/upload \
   -F html=@deck.html
 ```
 
-`201` body: `{ "id", "slug", "url" }`. Give the user `url`. Modes are `paste` (`html`), `files` (repeat `files`, include `index.html`), and `zip` (`zip`). Max ~10MB. Custom `slug` is signed-in only — guests must omit it.
+`201` body: `{ "id", "slug", "url" }`. Give the user `url`. Modes are `paste` (`html`), `files` (repeat `files`, include `index.html`), and `zip` (`zip`). Max ~10MB.
+
+Custom `/d/<name>/` URLs need a signed-in session. Agents and the CLI sign the user in with Magic Auth (email a 6-digit code, then verify), then upload with `Authorization: Bearer <session>` and form field `slug`. Guests must omit `slug`. Never call WorkOS from the CLI or skill — only `slides.availabooks.com`.
+
+```
+npx slides login --email you@example.com
+npx slides upload deck.html --slug my-talk
+```
+
+The CLI stores the session in `~/.slides/session`. Non-interactive runs send the code, print “re-run with --code”, and exit 2. `slides whoami` checks the token; `slides slug <id> --slug NAME` renames an owned deck.
 
 WorkOS app separation
 ---------------------
@@ -127,7 +137,7 @@ This starts a local dev server with:
   - `GET /api/me`
   - `POST /api/auth/magic/start` `{ email }` — WorkOS Magic Auth (returns 503 if `WORKOS_API_KEY` missing)
   - On magic/start, the Worker calls WorkOS to create a code, then sends a custom branded email via Cloudflare Email Service (`send_email` binding). The code is never returned over HTTP.
-  - `POST /api/auth/magic/verify` `{ email, code }` — WorkOS verifies the code; on success sets httpOnly `ai_slides_session` cookie (HMAC with `SESSION_SECRET`)
+  - `POST /api/auth/magic/verify` `{ email, code }` — WorkOS verifies the code; response JSON `{ session, user }` plus httpOnly `ai_slides_session` cookie (HMAC with `SESSION_SECRET`). CLI and agents use `Authorization: Bearer <session>`.
   - `POST /api/auth/logout`
   - `GET /api/decks` — list for signed‑in user
   - `PATCH /api/decks/:id` `{ slug }` — owner only; set or clear a custom URL
@@ -186,4 +196,4 @@ Notes
 
 - Deck IDs are short URL‑safe strings. Owners can unpublish (delete) decks they own; guests cannot.
 - Authentication uses WorkOS Magic Auth API with a custom UI — no hosted AuthKit pages are used.
-- The Worker runs first and falls back to static assets; the SPA uses client‑side routing with single‑page-application fallback for unknown paths.
+- The Worker runs first and falls back to static assets; the SPA uses client‑side routing with single‑page‑application fallback for unknown paths.
