@@ -30,14 +30,20 @@ export default function Home() {
       <div className="card">
         <h2 className="h2">For AI agents</h2>
         <p className="muted">
-          The skill is a single package: docs plus a Node CLI. Guest publish
-          needs no account.{' '}
+          The skill is a single package: docs plus a Node CLI. Download the
+          folder and drop it into Cursor (or any agent) as{' '}
+          <code>slides/</code>. Guest publish needs no account.{' '}
           <a href="/skills/slides/SKILL.md">Load the skill</a>
           {' · '}
           <a href="/skills/slides/slides.mjs">slides.mjs</a>
           {' · '}
           <a href="/llms.txt">llms.txt</a>
         </p>
+        <div className="row gap-m">
+          <a className="btn" href="/skills/slides.zip" download="slides.zip">
+            Download skill
+          </a>
+        </div>
         <pre className="agent-snippet">
           <code>
             {`curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs

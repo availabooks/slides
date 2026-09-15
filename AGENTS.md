@@ -6,6 +6,7 @@ If you need to **publish a deck**, do not guess APIs. The skill folder is the wh
 
 - Live skill: https://slides.availabooks.com/skills/slides/SKILL.md
 - Live CLI: https://slides.availabooks.com/skills/slides/slides.mjs
+- Skill zip: https://slides.availabooks.com/skills/slides.zip (unpacks to `slides/` with everything)
 - In-repo: [skills/slides/](skills/slides/)
 - Discovery: https://slides.availabooks.com/llms.txt
 

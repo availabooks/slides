@@ -11,11 +11,13 @@ The skill folder is the whole package: markdown + a zero-dependency Node CLI.
 
 - [slides skill](https://slides.availabooks.com/skills/slides/SKILL.md)
 - [slides.mjs CLI](https://slides.availabooks.com/skills/slides/slides.mjs)
+- [slides.zip](https://slides.availabooks.com/skills/slides.zip) — full skill folder (`SKILL.md`, `slides.mjs`, `package.json`)
 
 Load the skill whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks), including custom slugs after Magic Auth.
 
-    curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
-    node slides.mjs upload deck.html --slug my-talk
+    curl -fsSL -o slides.zip https://slides.availabooks.com/skills/slides.zip
+    unzip slides.zip
+    node slides/slides.mjs upload deck.html --slug my-talk
 
 ## Quick start
 
