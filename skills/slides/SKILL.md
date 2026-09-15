@@ -9,6 +9,7 @@ description: Publish HTML/CSS/JS presentation decks to Slides (slides.availabook
 
 Live skill: `https://slides.availabooks.com/skills/slides/SKILL.md`
 CLI (same package): `https://slides.availabooks.com/skills/slides/slides.mjs`
+Zip of this folder: `https://slides.availabooks.com/skills/slides.zip`
 Discovery: `https://slides.availabooks.com/llms.txt`
 
 This skill **is** the package. The folder contains:
@@ -19,7 +20,7 @@ This skill **is** the package. The folder contains:
 | `slides.mjs` | Node 18+ CLI (no npm dependencies) |
 | `package.json` | Optional `bin` so `npx slides` works from this folder |
 
-If this skill is already on disk, run `node slides.mjs` from this directory. If you only fetched the markdown, download the sibling CLI from the same origin (see **CLI** below).
+Download the zip and unpack it — you get a `slides/` directory with those files. Drop that folder into Cursor skills (or your agent’s skill path). If this skill is already on disk, run `node slides.mjs` from this directory. If you only fetched the markdown, download the sibling CLI from the same origin (see **CLI** below).
 
 ## When to use this
 
@@ -154,6 +155,14 @@ Pass `"slug": null` (or `""`) to drop the custom name. The random `/d/<id>/` lin
 
 The CLI ships **in this skill** (`slides.mjs`). Node 18+ is enough — do not `npm install` the host app, and do not clone the repo just to upload.
 
+To get the whole folder (this file, the CLI, and `package.json`):
+
+```bash
+curl -fsSL -o slides.zip https://slides.availabooks.com/skills/slides.zip
+unzip slides.zip
+node slides/slides.mjs --help
+```
+
 From this skill directory:
 
 ```bash
@@ -193,7 +202,7 @@ From a clone of this repo, `npx slides` is the same file (`skills/slides/slides.
 `Content-Type` must be `multipart/form-data` (curl `-F` does this). JSON bodies are not accepted for upload.
 
 | Field | Required | Notes |
-| --- | --- | --- |
+| --- | --- |
 | `mode` | yes | `paste`, `files`, or `zip` |
 | `html` | if `paste` | Full HTML document. File (`html=@deck.html`) or string. |
 | `files` | if `files` | Repeat the field for each file. Must include `index.html`, or a **single** `.html` file (renamed to `index.html`). |

@@ -18,10 +18,11 @@ Other agents can publish a deck with one unauthenticated POST. No API key.
 
 - Live skill: https://slides.availabooks.com/skills/slides/SKILL.md
 - Live CLI (same package): https://slides.availabooks.com/skills/slides/slides.mjs
+- Skill zip: https://slides.availabooks.com/skills/slides.zip (full folder)
 - Discovery file: https://slides.availabooks.com/llms.txt
 - Canonical copy in this repo: `skills/slides/` (`SKILL.md` + `slides.mjs`)
 
-The skill folder is the whole agent package. No repo clone or `npm install` is required to upload:
+The skill folder is the whole agent package. Download the zip and unpack it to get `slides/SKILL.md`, `slides/slides.mjs`, and `slides/package.json`. No repo clone or `npm install` is required to upload:
 
 ```
 curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
