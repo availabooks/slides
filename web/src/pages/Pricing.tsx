@@ -36,6 +36,11 @@ const rows: Array<{ feature: string; guest: string; account: string }> = [
     feature: 'Price',
     guest: 'Free',
     account: 'Free'
+  },
+  {
+    feature: 'Promotional emails',
+    guest: 'None',
+    account: 'Yes — products and related services (we don’t sell your data)'
   }
 ];
 
@@ -67,11 +72,35 @@ export default function Pricing() {
             <li>Everything guests get</li>
             <li>Custom names like /d/welcome/</li>
             <li>My decks list and unpublish</li>
+            <li>Promotional emails about our products</li>
           </ul>
           <Link to="/sign-in" className="btn">
             Create a free account
           </Link>
+          <p className="muted small pricing-email-note">
+            By creating an account, you agree we may email you promotional content
+            about Availabooks products and related services. We do not sell your
+            email or personal data to third parties.
+          </p>
         </article>
+      </div>
+      <div className="card">
+        <h2 className="h2">Email when you sign up</h2>
+        <p className="muted lead">
+          Signing up is free, and it means we will use the email address you
+          provide to send promotional emails about our products and related
+          services.
+        </p>
+        <ul className="list">
+          <li>
+            <strong>We will</strong> email you promotional content about
+            Availabooks products and related services.
+          </li>
+          <li>
+            <strong>We will not</strong> sell your email or personal data to
+            third parties.
+          </li>
+        </ul>
       </div>
       <div className="card">
         <h2 className="h2">Compare</h2>

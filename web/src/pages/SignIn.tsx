@@ -79,6 +79,11 @@ export default function SignIn() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <p className="muted small">
+            By continuing, you agree we may email you promotional content about
+            Availabooks products and related services. We do not sell your email
+            or personal data to third parties.
+          </p>
           <button className="btn" type="submit" disabled={busy}>
             {busy ? 'Sending…' : 'Send code'}
           </button>

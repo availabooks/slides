@@ -492,6 +492,12 @@ input.input:focus {
   width: fit-content;
 }
 
+.pricing-email-note {
+  margin-top: 0.85rem;
+  max-width: 28rem;
+  line-height: 1.45;
+}
+
 .pricing-card-featured {
   border-color: #bfdbfe;
   box-shadow: 0 0 0 3px var(--accent-soft);
