@@ -195,27 +195,41 @@ function formValueAsText(value: FormDataEntryValue | null): Promise<string> | st
   return value.text();
 }
 
+/** Critical host CSS inlined so slideshow chrome works before external CSS arrives. */
+const SLIDES_HOST_CRITICAL_CSS =
+  'html.slides-host-on,html.slides-host-on body{height:100%;margin:0;overflow:hidden}' +
+  'html.slides-host-on .slides-host-root{position:relative;height:100%;height:100dvh;overflow:hidden}' +
+  'html.slides-host-on .slides-host-root>[data-slides-host-slide]:not(.slides-host-active){display:none!important}' +
+  'html.slides-host-on .slides-host-root>[data-slides-host-slide].slides-host-active{display:flex!important;flex-direction:column;position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box}' +
+  '.slides-host-nav{position:fixed;bottom:max(1.15rem,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:.45rem;z-index:40;background:rgba(15,23,42,.88);padding:.35rem;border-radius:999px}' +
+  '.slides-host-nav button{border:0;background:transparent;color:#f8fafc;font:inherit;font-weight:600;min-width:2.75rem;min-height:2.5rem;padding:.4rem .85rem;border-radius:999px;cursor:pointer}' +
+  '.slides-host-hint{position:fixed;bottom:max(1.35rem,env(safe-area-inset-bottom));left:max(1.1rem,env(safe-area-inset-left));z-index:39;margin:0;font:.78rem/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:rgba(100,116,139,.95);pointer-events:none}' +
+  '.slides-host-num{position:fixed;bottom:max(1.3rem,env(safe-area-inset-bottom));right:max(1.1rem,env(safe-area-inset-right));z-index:41;border:0;background:rgba(248,250,252,.88);font:600 .85rem/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;color:#334155;cursor:pointer;min-height:2.5rem;padding:.4rem .7rem;border-radius:8px}' +
+  '.slides-host-picker{position:fixed;inset:0;z-index:50;display:none}' +
+  '.slides-host-picker.open{display:flex}';
+
 function enhanceDeckHtml(html: string): string {
   if (/\/slides-host\/slides-host\.js/i.test(html)) return html;
-  let out = html;
-  if (!/<meta[^>]+name=["']viewport["']/i.test(out)) {
-    if (/<head[^>]*>/i.test(out)) {
-      out = out.replace(
-        /<head([^>]*)>/i,
-        '<head$1>\n<meta name="viewport" content="width=device-width, initial-scale=1" />'
-      );
-    }
-  }
-  const tags =
+  const needsViewport = !/<meta[^>]+name=["']viewport["']/i.test(html);
+  // Put host assets in <head> so CSS is discovered before the deck body paints.
+  // Late </body> injection caused a first-load FOUC: all slides stacked, nav at page end.
+  const hostTags =
+    `<style data-slides-host-critical>${SLIDES_HOST_CRITICAL_CSS}</style>\n` +
     '<link rel="stylesheet" href="/slides-host/slides-host.css" />\n' +
     '<script src="/slides-host/slides-host.js" defer></script>\n';
-  if (/<\/body>/i.test(out)) {
-    return out.replace(/<\/body>/i, `${tags}</body>`);
+  const headInject =
+    (needsViewport ? '<meta name="viewport" content="width=device-width, initial-scale=1" />\n' : '') +
+    hostTags;
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>\n${headInject}`);
   }
-  if (/<\/html>/i.test(out)) {
-    return out.replace(/<\/html>/i, `${tags}</html>`);
+  if (/<\/body>/i.test(html)) {
+    return html.replace(/<\/body>/i, `${hostTags}</body>`);
   }
-  return `${out}\n${tags}`;
+  if (/<\/html>/i.test(html)) {
+    return html.replace(/<\/html>/i, `${hostTags}</html>`);
+  }
+  return `${html}\n${hostTags}`;
 }
 
 async function handleUpload(request: Request, env: Env): Promise<Response> {
