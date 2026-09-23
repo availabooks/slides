@@ -14,35 +14,22 @@ Public source: https://github.com/availabooks/slides
 For AI agents
 -------------
 
-Other agents can publish a deck with one unauthenticated POST. No API key.
+Publish with the skill + CLI. An Availabooks account is required (no guest uploads).
 
-- Live skill: https://slides.availabooks.com/skills/slides/SKILL.md
-- Live CLI (same package): https://slides.availabooks.com/skills/slides/slides.mjs
-- Skill zip: https://slides.availabooks.com/skills/slides.zip (full folder)
-- Discovery file: https://slides.availabooks.com/llms.txt
-- Canonical copy in this repo: `skills/slides/` (`SKILL.md` + `slides.mjs`)
-
-The skill folder is the whole agent package. Download the zip and unpack it to get `slides/SKILL.md`, `slides/slides.mjs`, and `slides/package.json`. No repo clone or `npm install` is required to upload:
+- Live skill: https://app.availabooks.com/slides/skills/slides/SKILL.md
+- Live CLI (same package): https://app.availabooks.com/slides/skills/slides/slides.mjs
+- Skill zip: https://app.availabooks.com/slides/skills/slides.zip
+- Discovery file: https://app.availabooks.com/slides/llms.txt
+- Canonical copy: `skills/slides/` (`SKILL.md` + `slides.mjs`), synced from `app/slides/`
 
 ```
-curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
-node slides.mjs upload deck.html
-node slides.mjs login --email you@example.com
+curl -fsSL -o slides.mjs https://app.availabooks.com/slides/skills/slides/slides.mjs
+node slides.mjs login
+# finish sign-in in the browser, then:
 node slides.mjs upload deck.html --slug my-talk
 ```
 
-```
-curl -sS -X POST https://slides.availabooks.com/api/upload \
-  -F mode=paste \
-  -F html=@deck.html
-```
-
-`201` body: `{ "id", "slug", "url" }`. Give the user `url`. Modes are `paste` (`html`), `files` (repeat `files`, include `index.html`), and `zip` (`zip`). Max ~10MB.
-
-Custom `/d/<name>/` URLs need a signed-in session. The bundled CLI signs the user in with Magic Auth (email a 6-digit code, then verify), then uploads with a Bearer session and `slug`. Guests must omit `slug`. Never call WorkOS from the CLI or skill — only `slides.availabooks.com`.
-
-The CLI stores the session in `~/.slides/session`. Non-interactive runs send the code, print “re-run with --code”, and exit 2. `node slides.mjs whoami` checks the token; `node slides.mjs slug <id> --slug NAME` renames an owned deck. From a clone of this repo, `npx slides` is the same `skills/slides/slides.mjs`.
-
+Default `login` opens the browser (no `--email`). Optional headless Magic Auth: `login --email …`. Pass `--host` for non-production; the share URL is on that host. Never call WorkOS — only Availabooks host APIs.
 WorkOS app separation
 ---------------------
 

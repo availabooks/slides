@@ -162,8 +162,7 @@ export default function Home() {
           <pre className="agent-snippet">
             <code>
               {`curl -fsSL -o slides.mjs https://slides.availabooks.com/skills/slides/slides.mjs
-node slides.mjs upload deck.html
-node slides.mjs login --email you@example.com
+node slides.mjs login
 node slides.mjs upload deck.html --slug my-talk`}
             </code>
           </pre>

@@ -6,5 +6,5 @@
   "bin": {
     "slides": "./slides.mjs"
   },
-  "description": "CLI for slides.availabooks.com. Bundled with the Slides agent skill — no extra npm dependencies."
+  "description": "CLI for app.availabooks.com/slides. Bundled with the Slides agent skill — no extra npm dependencies."
 }

@@ -1,38 +1,39 @@
 # Slides
 
-> Free host for AI-made HTML/CSS/JS presentation decks. No account required to publish. Sign in to choose a custom /d/<name>/ URL.
+> Host for AI-made HTML/CSS/JS presentation decks. An Availabooks account is required to publish. Published decks are public.
 
-Production: https://slides.availabooks.com
-Source: https://github.com/availabooks/slides
+Production: https://app.availabooks.com/slides
 
 ## Agent skill (includes CLI)
 
 The skill folder is the whole package: markdown + a zero-dependency Node CLI.
 
-- [slides skill](https://slides.availabooks.com/skills/slides/SKILL.md)
-- [slides.mjs CLI](https://slides.availabooks.com/skills/slides/slides.mjs)
-- [slides.zip](https://slides.availabooks.com/skills/slides.zip) — full skill folder (`SKILL.md`, `slides.mjs`, `package.json`)
+- [slides skill](https://app.availabooks.com/slides/skills/slides/SKILL.md)
+- [slides.mjs CLI](https://app.availabooks.com/slides/skills/slides/slides.mjs)
+- [slides.zip](https://app.availabooks.com/slides/skills/slides.zip) — full skill folder (`SKILL.md`, `slides.mjs`, `package.json`)
 
-Load the skill whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks), including custom slugs after Magic Auth.
+Load the skill whenever you need to host or share HTML/CSS/JS slides (Reveal.js, impress.js, or hand-written decks).
 
 Decks that use `#deck > .slide` (or `.deck > section`) automatically get mobile swipe, shareable `#n` links, and a thumbnail jumper. Reveal.js keeps its own `#/n` + overview. See the skill.
 
-    curl -fsSL -o slides.zip https://slides.availabooks.com/skills/slides.zip
+    curl -fsSL -o slides.zip https://app.availabooks.com/slides/skills/slides.zip
     unzip slides.zip
+    node slides/slides.mjs login
+    # finish sign-in in the browser, then:
     node slides/slides.mjs upload deck.html --slug my-talk
 
 ## Quick start
 
-POST https://slides.availabooks.com/api/upload as multipart form data.
+Prefer `slides login` (opens the system browser to Availabooks `/login`; no `--email` required). Optional headless Magic Auth: `slides login --email …` (never invent the 6-digit code).
 
-    curl -sS -X POST https://slides.availabooks.com/api/upload \
-      -F mode=paste \
-      -F html=@deck.html
+Then upload with the CLI, or `POST https://app.availabooks.com/slides/api/upload` as multipart form data with a live session cookie (`availabooks-app-session` or `availabook-course-<id>`) and `Origin: https://app.availabooks.com`. Skip any `Set-Cookie` with `Max-Age=0`.
 
-Success (201): `{ "id", "slug", "url" }`. Give the user `url` (example `https://slides.availabooks.com/d/<id>/`).
+Pass `--host` / `SLIDES_HOST` for non-production. The share URL is on that same host — a local upload is not on app.availabooks.com.
 
-Modes: `paste` (field `html`), `files` (repeat field `files`, include `index.html`), `zip` (field `zip`). Max ~10MB. No API key.
+Prefer the bundled CLI (`slides.mjs`). Never call WorkOS directly.
 
-Custom `/d/<name>/` URLs: sign the user in with Magic Auth (`POST /api/auth/magic/start` then `verify`), then upload with `Authorization: Bearer <session>` and form field `slug`. Never invent the 6-digit email code. Prefer the bundled CLI (`slides.mjs`) for that flow.
+Success (201): `{ "id", "slug", "url" }`. Give the user `url` (example `https://app.availabooks.com/slides/d/<id>/`).
 
-Do not invent other publish APIs. Do not call WorkOS directly.
+Modes: `paste` (field `html`), `files` (repeat field `files`, include `index.html`), `zip` (field `zip`). Max ~10MB.
+
+Do not invent other publish APIs.
